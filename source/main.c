@@ -45,6 +45,8 @@
 #include "audio.h"
 #include "audio_usb.h"
 #include "rtos.h"
+#include "mtb_ssd1306.h"
+#include "GUI.h"
 
 
 /*****************************************************************************
@@ -53,7 +55,9 @@
 * Summary:
 *  This is the main function for CM4 CPU. It does...
 *    1. Initializes the target BSP.
-*    2. Initializes retarget-io to use the debug UART port.
+*    2. Initializes the I2C.
+*    3. Initializes retarget-io to use the debug UART port.
+*    4. Initialize the OLED display.
 *    3. Initializes the User LED.
 *    4. Initializes the audio app and starts the FreeRTOS scheduler.
 *
@@ -69,9 +73,19 @@
 int main(void)
 {
     cy_rslt_t result;
+    cyhal_i2c_t i2c_obj;
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
+    if (CY_RSLT_SUCCESS != result)
+    {
+        CY_ASSERT(0);
+    }
+
+    /* Initialize the I2C to use with the OLED display */
+    result = cyhal_i2c_init(&i2c_obj, CYBSP_I2C_SDA, CYBSP_I2C_SCL, NULL);
+
+    /* I2C init failed. Stop program execution */
     if (CY_RSLT_SUCCESS != result)
     {
         CY_ASSERT(0);
@@ -81,6 +95,15 @@ int main(void)
     result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
 
     /* retarget-io init failed. Stop program execution */
+    if (CY_RSLT_SUCCESS != result)
+    {
+        CY_ASSERT(0);
+    }
+
+    /* Initialize the OLED display */
+    result = mtb_ssd1306_init_i2c(&i2c_obj);
+
+    /* OLED init failed. Stop program execution */
     if (CY_RSLT_SUCCESS != result)
     {
         CY_ASSERT(0);
@@ -97,6 +120,9 @@ int main(void)
 
     /* Enable global interrupts */
     __enable_irq();
+
+    GUI_Init();
+    GUI_DispString("Audio recorder");
 
     /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
     printf("\x1b[2J\x1b[;H");
