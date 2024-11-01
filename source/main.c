@@ -45,8 +45,8 @@
 #include "audio.h"
 #include "audio_usb.h"
 #include "rtos.h"
-#include "mtb_ssd1306.h"
-#include "GUI.h"
+// #include "mtb_ssd1306.h"
+// #include "GUI.h"
 
 
 /*****************************************************************************
@@ -73,7 +73,7 @@
 int main(void)
 {
     cy_rslt_t result;
-    cyhal_i2c_t i2c_obj;
+    // cyhal_i2c_t i2c_obj;
 
     /* Initialize the device and board peripherals */
     result = cybsp_init();
@@ -83,13 +83,13 @@ int main(void)
     }
 
     /* Initialize the I2C to use with the OLED display */
-    result = cyhal_i2c_init(&i2c_obj, CYBSP_I2C_SDA, CYBSP_I2C_SCL, NULL);
+    // result = cyhal_i2c_init(&i2c_obj, CYBSP_I2C_SDA, CYBSP_I2C_SCL, NULL);
 
     /* I2C init failed. Stop program execution */
-    if (CY_RSLT_SUCCESS != result)
-    {
-        CY_ASSERT(0);
-    }
+    // if (CY_RSLT_SUCCESS != result)
+    // {
+    //     CY_ASSERT(0);
+    // }
 
     /* Initialize retarget-io to use the debug UART port */
     result = cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
@@ -101,13 +101,13 @@ int main(void)
     }
 
     /* Initialize the OLED display */
-    result = mtb_ssd1306_init_i2c(&i2c_obj);
+    // result = mtb_ssd1306_init_i2c(&i2c_obj);
 
     /* OLED init failed. Stop program execution */
-    if (CY_RSLT_SUCCESS != result)
-    {
-        CY_ASSERT(0);
-    }
+    // if (CY_RSLT_SUCCESS != result)
+    // {
+    //     CY_ASSERT(0);
+    // }
 
     /* Initialize the User LED */
     result = cyhal_gpio_init(CYBSP_USER_LED, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_STATE_OFF);
@@ -121,8 +121,8 @@ int main(void)
     /* Enable global interrupts */
     __enable_irq();
 
-    GUI_Init();
-    GUI_DispString("Audio recorder");
+    // GUI_Init();
+    // GUI_DispString("Audio recorder");
 
     /* \x1b[2J\x1b[;H - ANSI ESC sequence for clear screen */
     printf("\x1b[2J\x1b[;H");
