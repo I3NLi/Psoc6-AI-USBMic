@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "CY8CEVAL-062S2-MUR-43439M2 BSP", "index.html", [
+  [ "CY8CKIT-062S2-AI BSP", "index.html", [
     [ "Overview", "index.html#autotoc_md1", null ],
     [ "Features", "index.html#autotoc_md2", [
       [ "Kit Features:", "index.html#autotoc_md3", null ],

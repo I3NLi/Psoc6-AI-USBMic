@@ -6,10 +6,6 @@ var group__group__bsp__pins__comm =
     [ "CYBSP_I2C_SDA", "group__group__bsp__pins__comm.html#gad178ee7378678fe5829a826f9a4ed0b8", null ],
     [ "CYBSP_SWDIO", "group__group__bsp__pins__comm.html#ga9fba070d4040d6aa4f3e429bdfc38946", null ],
     [ "CYBSP_SWDCK", "group__group__bsp__pins__comm.html#ga8f50aad29445466679abdcc75dcd9796", null ],
-    [ "CYBSP_SPI_MOSI", "group__group__bsp__pins__comm.html#ga07b4c8b6a15a1e614ff9be2ebe8088fd", null ],
-    [ "CYBSP_SPI_MISO", "group__group__bsp__pins__comm.html#gaf6282da9ac2be0fe7a4ac84735a24bb0", null ],
-    [ "CYBSP_SPI_CLK", "group__group__bsp__pins__comm.html#gabeb93b3f9b953934666f83a1a97c4367", null ],
-    [ "CYBSP_SPI_CS", "group__group__bsp__pins__comm.html#gad8d3655d655bb752363587ea521c8856", null ],
     [ "CYBSP_SWO", "group__group__bsp__pins__comm.html#ga83425838dc05860473aebf66214ed9d3", null ],
     [ "CYBSP_QSPI_SS", "group__group__bsp__pins__comm.html#ga020ca7a044acda4b35e451513e5830df", null ],
     [ "CYBSP_QSPI_D3", "group__group__bsp__pins__comm.html#ga2ad55ac5a5ea027d72c8f702c7f9bbde", null ],
@@ -37,5 +33,7 @@ var group__group__bsp__pins__comm =
     [ "CYBSP_BT_HOST_WAKE_IRQ_EVENT", "group__group__bsp__pins__comm.html#gab480375f418ada758be1e7f32e42b232", null ],
     [ "CYBSP_BT_DEVICE_WAKE", "group__group__bsp__pins__comm.html#ga157d988297cf9f6e736a6b2568393b57", null ],
     [ "CYBSP_BT_DEVICE_WAKE_GPIO_DM", "group__group__bsp__pins__comm.html#ga2e4aea75f92232352bef06af68df7fbe", null ],
-    [ "CYBSP_BT_DEVICE_WAKE_POLARITY", "group__group__bsp__pins__comm.html#ga819696334214ae0d912c381c7fb574f9", null ]
+    [ "CYBSP_BT_DEVICE_WAKE_POLARITY", "group__group__bsp__pins__comm.html#ga819696334214ae0d912c381c7fb574f9", null ],
+    [ "CYBSP_PDM_CLK", "group__group__bsp__pins__comm.html#gaee3607f958046ea444d57a2263c4b9a3", null ],
+    [ "CYBSP_PDM_DATA", "group__group__bsp__pins__comm.html#gaaf4f4f826f24c43f2b6985837f5b77ac", null ]
 ];

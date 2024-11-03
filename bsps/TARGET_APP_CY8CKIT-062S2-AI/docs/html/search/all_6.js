@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['led_20pins_0',['LED Pins',['../group__group__bsp__pins__led.html',1,'']]]
+  ['peripheral_20default_20bsp_20settings_0',['Peripheral Default BSP Settings',['../md_source_bsps_cat1a_CY8CKIT_062S2_AI_bsp_settings.html',1,'']]],
+  ['pin_20mappings_1',['Pin Mappings',['../group__group__bsp__pins.html',1,'']]],
+  ['pin_20states_2',['Pin States',['../group__group__bsp__pin__state.html',1,'']]]
 ];

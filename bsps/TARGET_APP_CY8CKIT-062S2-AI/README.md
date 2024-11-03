@@ -1,12 +1,11 @@
-# CY8CEVAL-062S2-MUR-43439M2 BSP
+# CY8CKIT-062S2-AI BSP
 
 ## Overview
 
-The CY8CEVAL-062S2 PSoC™ 62S2 Evaluation Kit enables you to evaluate and develop applications using PSoC™ 62 MCU. The PSoC™ 62S2 evaluation kit features an M.2 interface that enables you to connect the supported M.2 radio cards based on AIROC™ Wi-Fi/Bluetooth combo devices. It comes with industry-leading CAPSENSE™ for touch buttons and slider, on-board debugger/programmer with KitProg3, microSD card interface, 512-Mb Quad-SPI NOR flash, PDM-PCM microphone interface, mikroBUS add-on board interface for peripheral expansion, OPTIGA Trust M device.     
-**Note:**
-CY8CEVAL-062S2-MUR-43439M2 is the board support package for the PSoC™ 62S2 Evaluation Kit in combination with the Embedded Artists 1YN Wi-Fi/Bluetooth M.2 radio module and supports PSoC™ 6 MCU examples and Wi-Fi/Bluetooth connectivity examples.
+The CY8CKIT-062S2-AI PSoC™ 62S2 AI Evaluation Kit is a cost effective and small development kit providing the best of Infineon's solutions to drive adoption of Infineon's hardware, Imagimob Studio and Infineon's Software products.
 
 
+![](docs/html/board.png)
 
 To use code from the BSP, simply include a reference to `cybsp.h`.
 
@@ -14,23 +13,20 @@ To use code from the BSP, simply include a reference to `cybsp.h`.
 
 ### Kit Features:
 
-* Support of up to 2MB Flash and 1MB SRAM
-* Dedicated M.2 interface to connect with M.2 radio modules based on AIROC™ Wi-Fi/Bluetooth combo devices.
-* mikroBUS add-on board interface for peripheral expansion.
-* Delivers dual-cores, with a 150-MHz Arm® Cortex®-M4 as the primary application processor and a 100-MHz Arm® Cortex®-M0+ as the secondary processor for low-power operations.
-* Supports Full-Speed USB, capacitive-sensing with CAPSENSE, a PDM-PCM digital microphone interface, a Quad- SPI interface, 13 serial communication blocks, 7 programmable analog blocks, and 56 programmable digital blocks.
+* Support of up to 512-Mb NOR flash
+* Supports Full-Speed USB, a PDM-PCM digital microphone interface, a Quad-SPI interface, an I2C interface.
+* Supports 6-axis motion sensor (BMI270)
+* Supports magnetometer (BMM350)
+* Supports barometric pressure sensor (DPS368)
+* Supports RADAR sensor (BGT60TR13C)
 
 ### Kit Contents:
 
-* PSoC™ 62S2 Evaluation Board
-* USB Type-A to Micro-B cable
-* Four jumper wires (4 inches each)
-* Two jumper wires (5 inches each)
-* Quick start guide
+* PSoC™ 62S2 AI Evaluation board
 
 ## BSP Configuration
 
-The BSP has a few hooks that allow its behavior to be configured. Some of these items are enabled by default while others must be explicitly enabled. Items enabled by default are specified in the CY8CEVAL-062S2-MUR-43439M2.mk file. The items that are enabled can be changed by creating a custom BSP or by editing the application makefile.
+The BSP has a few hooks that allow its behavior to be configured. Some of these items are enabled by default while others must be explicitly enabled. Items enabled by default are specified in the CY8CKIT-062S2-AI.mk file. The items that are enabled can be changed by creating a custom BSP or by editing the application makefile.
 
 Components:
 * Device specific category reference (e.g.: CAT1) - This component, enabled by default, pulls in any device specific code for this board.
@@ -59,19 +55,19 @@ See the [BSP Setttings][settings] for additional board specific configuration se
 
 ## API Reference Manual
 
-The CY8CEVAL-062S2-MUR-43439M2 Board Support Package provides a set of APIs to configure, initialize and use the board resources.
+The CY8CKIT-062S2-AI Board Support Package provides a set of APIs to configure, initialize and use the board resources.
 
 See the [BSP API Reference Manual][api] for the complete list of the provided interfaces.
 
 ## More information
-* [CY8CEVAL-062S2-MUR-43439M2 BSP API Reference Manual][api]
-* [CY8CEVAL-062S2-MUR-43439M2 Documentation](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/)
+* [CY8CKIT-062S2-AI BSP API Reference Manual][api]
+* [CY8CKIT-062S2-AI Documentation](https://www.infineon.com/CY8CKIT-062S2-AI)
 * [Cypress Semiconductor, an Infineon Technologies Company](http://www.cypress.com)
 * [Infineon GitHub](https://github.com/infineon)
 * [ModusToolbox™](https://www.cypress.com/products/modustoolbox-software-environment)
 
-[api]: https://infineon.github.io/TARGET_CY8CEVAL-062S2-MUR-43439M2/html/modules.html
-[settings]: https://infineon.github.io/TARGET_CY8CEVAL-062S2-MUR-43439M2/html/md_bsp_settings.html
+[api]: https://infineon.github.io/TARGET_CY8CKIT-062S2-AI/html/modules.html
+[settings]: https://infineon.github.io/TARGET_CY8CKIT-062S2-AI/html/md_bsp_settings.html
 
 ---
 © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2024.

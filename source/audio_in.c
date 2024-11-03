@@ -43,6 +43,7 @@
 #include "cybsp.h"
 #include "cy_retarget_io.h"
 #include "cyhal.h"
+#include "cyhal_psoc6_02_124_bga.h"
 #include "rtos.h"
 #include "queue.h"
 #include "Global.h"
@@ -120,9 +121,9 @@ const cyhal_pdm_pcm_cfg_t pdm_pcm_cfg =
 };
 
 const cyhal_i2s_pins_t i2s_pins = {
-    .sck = CYBSP_A9,
-    .ws = CYBSP_A10,
-    .data = CYBSP_A11,
+    .sck = P9_1,
+    .ws = P9_2,
+    .data = P9_3,
     .mclk = NC,
 };
 

@@ -45,8 +45,6 @@
 #include "audio.h"
 #include "audio_usb.h"
 #include "rtos.h"
-// #include "mtb_ssd1306.h"
-// #include "GUI.h"
 
 
 /*****************************************************************************

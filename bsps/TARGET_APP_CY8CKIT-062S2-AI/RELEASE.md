@@ -1,12 +1,11 @@
-# CY8CEVAL-062S2-MUR-43439M2 BSP Release Notes
-The CY8CEVAL-062S2 PSoC™ 62S2 Evaluation Kit enables you to evaluate and develop applications using PSoC™ 62 MCU. The PSoC™ 62S2 evaluation kit features an M.2 interface that enables you to connect the supported M.2 radio cards based on AIROC™ Wi-Fi/Bluetooth combo devices. It comes with industry-leading CAPSENSE™ for touch buttons and slider, on-board debugger/programmer with KitProg3, microSD card interface, 512-Mb Quad-SPI NOR flash, PDM-PCM microphone interface, mikroBUS add-on board interface for peripheral expansion, OPTIGA Trust M device.     
-**Note:**
-CY8CEVAL-062S2-MUR-43439M2 is the board support package for the PSoC™ 62S2 Evaluation Kit in combination with the Embedded Artists 1YN Wi-Fi/Bluetooth M.2 radio module and supports PSoC™ 6 MCU examples and Wi-Fi/Bluetooth connectivity examples.
+# CY8CKIT-062S2-AI BSP Release Notes
+The CY8CKIT-062S2-AI PSoC™ 62S2 AI Evaluation Kit is a cost effective and small development kit providing the best of Infineon's solutions to drive adoption of Infineon's hardware, Imagimob Studio and Infineon's Software products.
+
 
 NOTE: BSPs are versioned by family. This means that version 1.2.0 of any BSP in a family (eg: PSoC™ 6) will have the same software maturity level. However, not all updates are necessarily applicable for each BSP in the family so not all version numbers will exist for each board. Additionally, new BSPs may not start at version 1.0.0. In the event of adding a common feature across all BSPs, the libraries are assigned the same version number. For example if BSP_A is at v1.3.0 and BSP_B is at v1.2.0, the event will trigger a version update to v1.4.0 for both BSP_A and BSP_B. This allows the common feature to be tracked in a consistent way.
 
 ### What's Included?
-The CY8CEVAL-062S2-MUR-43439M2 library includes the following:
+The CY8CKIT-062S2-AI library includes the following:
 * BSP specific makefile to configure the build process for the board
 * cybsp.c/h files to initialize the board and any system peripherals
 * cybsp_types.h file describing basic board setup
@@ -93,7 +92,7 @@ NOTE: This requires psoc6hal 1.2.0 or later
 * Initial release
 
 ### Supported Software and Tools
-This version of the CY8CEVAL-062S2-MUR-43439M2 BSP was validated for compatibility with the following Software and Tools:
+This version of the CY8CKIT-062S2-AI BSP was validated for compatibility with the following Software and Tools:
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
@@ -105,13 +104,13 @@ This version of the CY8CEVAL-062S2-MUR-43439M2 BSP was validated for compatibili
 Minimum required ModusToolbox™ Software Environment: v3.0.0
 
 ### More information
-* [CY8CEVAL-062S2-MUR-43439M2 BSP API Reference Manual][api]
-* [CY8CEVAL-062S2-MUR-43439M2 Documentation](https://www.infineon.com/cms/en/product/evaluation-boards/cy8ceval-062s2/)
+* [CY8CKIT-062S2-AI BSP API Reference Manual][api]
+* [CY8CKIT-062S2-AI Documentation](https://www.infineon.com/CY8CKIT-062S2-AI)
 * [Cypress Semiconductor, an Infineon Technologies Company](http://www.cypress.com)
 * [Infineon GitHub](https://github.com/infineon)
 * [ModusToolbox™](https://www.cypress.com/products/modustoolbox-software-environment)
 
-[api]: https://infineon.github.io/TARGET_CY8CEVAL-062S2-MUR-43439M2/html/modules.html
+[api]: https://infineon.github.io/TARGET_CY8CKIT-062S2-AI/html/modules.html
 
 ---
 © Cypress Semiconductor Corporation (an Infineon company) or an affiliate of Cypress Semiconductor Corporation, 2019-2022.

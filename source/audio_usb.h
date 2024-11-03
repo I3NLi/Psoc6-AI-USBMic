@@ -60,8 +60,8 @@ extern "C" {
 static const USB_DEVICE_INFO usb_device_info = {
   AUDIO_DEVICE_VENDOR_ID,        // VendorId
   AUDIO_DEVICE_PRODUCT_ID,      // ProductId
-  "Dream Technologies",      // VendorName
-  "Niubility Recorder",     // ProductName
+  "Infineon Technologies",      // VendorName
+  "USB Sound Recorder",     // ProductName
   "13245678"      // SerialNumber
 };
 

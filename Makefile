@@ -46,7 +46,7 @@ TARGET=APP_CY8CKIT-062S2-AI
 #
 # If APPNAME is edited, ensure to update or regenerate launch
 # configurations for your IDE.
-APPNAME=mtb-example-usb-device-audio-recorder-freertos
+APPNAME=i2s-usb-device-audio-recorder-freertos
 
 # Name of toolchain to use. Options include:
 #
@@ -68,7 +68,7 @@ TOOLCHAIN=GCC_ARM
 CONFIG=Debug
 
 # If set to "true" or "1", display full command-lines when building.
-VERBOSE=
+VERBOSE=1
 
 
 ################################################################################
@@ -85,7 +85,7 @@ VERBOSE=
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS+=USBD_BASE FREERTOS RTOS_AWARE EMWIN_NOSNTS 
+COMPONENTS+=USBD_BASE FREERTOS RTOS_AWARE 
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=
