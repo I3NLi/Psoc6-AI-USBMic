@@ -71,6 +71,15 @@
 /* Decimation Rate of the PDM/PCM block */
 #define DECIMATION_RATE             (64U)
 
+// /* Clock Settings */
+// #define SYS_CLOCK_HZ 98000000u /* in Hz. Ideally 98.304 MHz */
+
+// /* HFCLK1 Clock Divider */
+// #define HFCLK1_CLK_DIVIDER 4u
+
+#define USE_USB 1u
+#define USE_I2S 1u
+
 /* Audio Subsystem Clock. Typical values depends on the desired sample rate:
      * 8KHz / 16 KHz / 32 KHz / 48 KHz    : 24.576 MHz
      * 22.05 KHz / 44.1 KHz               : 22.579 MHz
@@ -95,6 +104,7 @@ uint16_t audio_in_pcm_buffer_ping[(MAX_AUDIO_IN_BUFFER_SIZE)];
 uint16_t audio_in_pcm_buffer_pong[(MAX_AUDIO_IN_BUFFER_SIZE)];
 
 /* HAL object */
+cyhal_i2s_t i2s;
 cyhal_pdm_pcm_t pdm_pcm;
 static cyhal_clock_t audio_clock;
 
@@ -107,6 +117,22 @@ const cyhal_pdm_pcm_cfg_t pdm_pcm_cfg =
     .word_length = AUDIO_IN_BIT_RESOLUTION,  /* bits */
     .left_gain = CYHAL_PDM_PCM_MAX_GAIN,   /* dB */
     .right_gain = CYHAL_PDM_PCM_MAX_GAIN,   /* dB */
+};
+
+const cyhal_i2s_pins_t i2s_pins = {
+    .sck = CYBSP_A9,
+    .ws = CYBSP_A10,
+    .data = CYBSP_A11,
+    .mclk = NC,
+};
+
+const cyhal_i2s_config_t i2s_config = {
+    .is_tx_slave = false,             /* TX is Master */
+    .is_rx_slave = false,             /* RX not used */
+    .mclk_hz = 0,                     /* External MCLK not used */
+    .channel_length = 32,             /* In bits */
+    .word_length = 16,                /* In bits */
+    .sample_rate_hz = MICROPHONE_FREQUENCIES, /* In Hz */
 };
 
 /********************************************************************************
@@ -168,6 +194,11 @@ void audio_in_init(void)
     {
         CY_ASSERT(0);
     }
+
+    /* Initialize the I2S */
+    cyhal_i2s_init(&i2s, &i2s_pins, NULL, &i2s_config, &audio_clock);
+    cyhal_i2s_register_callback(&i2s, i2s_isr_handler, NULL);
+    cyhal_i2s_enable_event(&i2s, CYHAL_I2S_ASYNC_TX_COMPLETE, CYHAL_ISR_PRIORITY_DEFAULT, true);
 
     /* Initialize the PDM PCM block */
     cyhal_pdm_pcm_init(&pdm_pcm, CYBSP_PDM_DATA, CYBSP_PDM_CLK, &audio_clock, &pdm_pcm_cfg);
@@ -271,8 +302,14 @@ void audio_in_process(void* arg) {
 
                 /* Read all the data in the PDM/PCM buffer */
                 cyhal_pdm_pcm_read(&pdm_pcm, (void*)audio_in_pcm_buffer, &audio_in_count);
-
-                USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                if (USE_I2S) {
+                    cyhal_i2s_write_async(&i2s, audio_in_pcm_buffer, audio_in_count);
+                    /* Start the I2S TX */
+                    cyhal_i2s_start_tx(&i2s);
+                }
+                if (USE_USB) {
+                    USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                }
                 break;
 
             default:
@@ -404,4 +441,26 @@ void audio_app_task(void* arg)
 
         vTaskDelay(pdMS_TO_TICKS(DELAY_TICKS));
     }
+}
+
+/*******************************************************************************
+ * Function Name: i2s_isr_handler
+ ********************************************************************************
+ * Summary:
+ *  I2S ISR handler. Stop the I2S TX and turn OFF the User LED.
+ *
+ * Parameters:
+ *  arg: not used
+ *  event: event that occurred
+ *
+ *******************************************************************************/
+void i2s_isr_handler(void *arg, cyhal_i2s_event_t event) {
+  (void)arg;
+  (void)event;
+
+  /* Stop the I2S TX */
+  cyhal_i2s_stop_tx(&i2s);
+
+  /* Turn off the User LED */
+  cyhal_gpio_write(CYBSP_USER_LED, CYBSP_LED_STATE_OFF);
 }

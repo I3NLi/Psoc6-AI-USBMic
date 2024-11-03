@@ -18,13 +18,19 @@
         //mtb//      macOS  : $HOME/Library/Application Support/Code/User/settings.json
         //mtb//      Linux  : $HOME/.config/Code/User/settings.json
         //mtb//
-        "modustoolbox.toolsPath": "C:/Users/usstl/ModusToolbox/tools_3.2",
+        "modustoolbox.toolsPath": "C:/Users/usstl/ModusToolbox/tools_3.3",
         "cortex-debug.armToolchainPath": "${config:modustoolbox.toolsPath}/gcc/bin",
         "cortex-debug.openocdPath": "${config:modustoolbox.toolsPath}/../../../../Infineon/Tools/ModusToolboxProgtools-1.2.1/openocd/bin/openocd.exe",
         "cortex-debug.JLinkGDBServerPath.windows": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
         "cortex-debug.JLinkGDBServerPath.osx": "/Applications/SEGGER/JLink/JLinkGDBServerCLExe",
         "cortex-debug.JLinkGDBServerPath.linux": "JLinkGDBServerCLExe",
-        "makefile.configureOnOpen": false
+        "makefile.configureOnOpen": false,
+        "clangd.arguments": [
+            "--query-driver=${config:modustoolbox.toolsPath}/gcc/bin/arm-none-eabi-gcc",
+            "--log=verbose",
+            "--background-index",
+            "--compile-commands-dir=${workspaceFolder}/build"
+        ]
     },
     "extensions": {
         "recommendations": [ "marus25.cortex-debug", "ms-vscode.cpptools", "dan-c-underwood.arm" ]

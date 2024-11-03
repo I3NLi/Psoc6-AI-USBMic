@@ -124,6 +124,7 @@ void audio_in_init(void);
 void audio_in_process(void *arg);
 void audio_clock_init(void);
 void audio_app_task(void* arg);
+void i2s_isr_handler(void *arg, cyhal_i2s_event_t event);
 
 #if defined(__cplusplus)
 }
