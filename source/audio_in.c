@@ -78,7 +78,7 @@
 // #define HFCLK1_CLK_DIVIDER 4u
 
 #define USE_USB 1u
-#define USE_I2S 1u
+#define USE_I2S 0u
 
 /* Audio Subsystem Clock. Typical values depends on the desired sample rate:
      * 8KHz / 16 KHz / 32 KHz / 48 KHz    : 24.576 MHz
@@ -275,7 +275,14 @@ void audio_in_process(void* arg) {
 
                 if (USBD_AC_OpenTXStream(&TX) == 0) {
                     MicActive = 1;
-                    USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                    if (USE_I2S) {
+                        cyhal_i2s_write_async(&i2s, audio_in_pcm_buffer, audio_in_count);
+                        /* Start the I2S TX */
+                        cyhal_i2s_start_tx(&i2s);
+                    }
+                    if (USE_USB) {
+                        USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                    }
                 }
                 break;
 
