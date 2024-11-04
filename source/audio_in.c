@@ -72,13 +72,6 @@
 /* Decimation Rate of the PDM/PCM block */
 #define DECIMATION_RATE             (64U)
 
-// /* Clock Settings */
-// #define SYS_CLOCK_HZ 98000000u /* in Hz. Ideally 98.304 MHz */
-
-// /* HFCLK1 Clock Divider */
-// #define HFCLK1_CLK_DIVIDER 4u
-
-#define USE_USB 1u
 #define USE_I2S 0u
 
 /* Audio Subsystem Clock. Typical values depends on the desired sample rate:
@@ -197,9 +190,12 @@ void audio_in_init(void)
     }
 
     /* Initialize the I2S */
-    cyhal_i2s_init(&i2s, &i2s_pins, NULL, &i2s_config, &audio_clock);
-    cyhal_i2s_register_callback(&i2s, i2s_isr_handler, NULL);
-    cyhal_i2s_enable_event(&i2s, CYHAL_I2S_ASYNC_TX_COMPLETE, CYHAL_ISR_PRIORITY_DEFAULT, true);
+
+    if (USE_I2S) {
+        cyhal_i2s_init(&i2s, &i2s_pins, NULL, &i2s_config, &audio_clock);
+        cyhal_i2s_register_callback(&i2s, i2s_isr_handler, NULL);
+        cyhal_i2s_enable_event(&i2s, CYHAL_I2S_ASYNC_TX_COMPLETE, CYHAL_ISR_PRIORITY_DEFAULT, true);
+    }
 
     /* Initialize the PDM PCM block */
     cyhal_pdm_pcm_init(&pdm_pcm, CYBSP_PDM_DATA, CYBSP_PDM_CLK, &audio_clock, &pdm_pcm_cfg);
@@ -281,9 +277,7 @@ void audio_in_process(void* arg) {
                         /* Start the I2S TX */
                         cyhal_i2s_start_tx(&i2s);
                     }
-                    if (USE_USB) {
-                        USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
-                    }
+                    USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
                 }
                 break;
 
@@ -315,9 +309,7 @@ void audio_in_process(void* arg) {
                     /* Start the I2S TX */
                     cyhal_i2s_start_tx(&i2s);
                 }
-                if (USE_USB) {
-                    USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
-                }
+                USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
                 break;
 
             default:
