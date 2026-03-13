@@ -51,8 +51,8 @@ static const U8 _ControlDesc[] = {
   0x01,                      // bTerminalID
   0x01, 0x02,                // wTerminalType
   0x00,                      // bAssocTerminal
-  0x01,                      // bNrChannels
-  0x04, 0x00,                // bmChannelConfig
+  0x02,                      // bNrChannels
+  0x03, 0x00,                // bmChannelConfig
   0x00,                      // iChannelNames
   0x10,                      // iTerminal
   // Feature Unit Descriptor
@@ -190,3 +190,4 @@ const USBD_AC_CONFIG USB_AC_Config_Microphone_configs = {
   _Endpoints,                // Endpoint list
   _Strings                   // String descriptors
 };
+

@@ -72,9 +72,11 @@
 /* Decimation Rate of the PDM/PCM block */
 #define DECIMATION_RATE             (64U)
 
-#define USE_I2S 0u
+#define USE_I2S 0U
+#define AUDIO_DIGITAL_GAIN_NUM      (3)
+#define AUDIO_DIGITAL_GAIN_DEN      (1)
 
-/* Audio Subsystem Clock. Typical values depends on the desired sample rate:
+/* Audio Subsystem Clock. UTypical values depends on the desired sample rate:
      * 8KHz / 16 KHz / 32 KHz / 48 KHz    : 24.576 MHz
      * 22.05 KHz / 44.1 KHz               : 22.579 MHz
      */
@@ -128,6 +130,26 @@ const cyhal_i2s_config_t i2s_config = {
     .word_length = 16,                /* In bits */
     .sample_rate_hz = MICROPHONE_FREQUENCIES, /* In Hz */
 };
+
+static void audio_apply_gain(uint16_t *buffer, size_t sample_count)
+{
+    for (size_t i = 0; i < sample_count; ++i)
+    {
+        int32_t sample = (int16_t)buffer[i];
+        sample = (sample * AUDIO_DIGITAL_GAIN_NUM) / AUDIO_DIGITAL_GAIN_DEN;
+
+        if (sample > 32767)
+        {
+            sample = 32767;
+        }
+        else if (sample < -32768)
+        {
+            sample = -32768;
+        }
+
+        buffer[i] = (uint16_t)((int16_t)sample);
+    }
+}
 
 /********************************************************************************
  * Function Name: vApplicationTickHook
@@ -304,6 +326,7 @@ void audio_in_process(void* arg) {
 
                 /* Read all the data in the PDM/PCM buffer */
                 cyhal_pdm_pcm_read(&pdm_pcm, (void*)audio_in_pcm_buffer, &audio_in_count);
+                audio_apply_gain(audio_in_pcm_buffer, audio_in_count);
                 if (USE_I2S) {
                     cyhal_i2s_write_async(&i2s, audio_in_pcm_buffer, audio_in_count);
                     /* Start the I2S TX */
@@ -464,3 +487,5 @@ void i2s_isr_handler(void *arg, cyhal_i2s_event_t event) {
   /* Turn off the User LED */
   cyhal_gpio_write(CYBSP_USER_LED, CYBSP_LED_STATE_OFF);
 }
+
+
