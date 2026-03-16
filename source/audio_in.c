@@ -74,6 +74,8 @@
 #define DECIMATION_RATE             (64U)
 
 #define USE_I2S 0U
+#define AUDIO_IN_SAMPLES_PER_USB_PACKET        (MAX_AUDIO_IN_BUFFER_SIZE)
+#define AUDIO_IN_BYTES_PER_USB_PACKET          (AUDIO_IN_SAMPLES_PER_USB_PACKET * sizeof(audio_in_pcm_buffer_ping[0]))
 
 /* Audio Subsystem Clock. UTypical values depends on the desired sample rate:
      * 8KHz / 16 KHz / 32 KHz / 48 KHz    : 24.576 MHz
@@ -345,6 +347,7 @@ void audio_in_process(void* arg) {
                 TX.Interface = USBD_AC_INTERFACE_Microphone;
                 TX.Timeout = 5000;
                 TX.pfCallback = audio_in_callback;
+                audio_in_count = AUDIO_IN_SAMPLES_PER_USB_PACKET;
 
                 if (USBD_AC_OpenTXStream(&TX) == 0) {
                     MicActive = 1;
@@ -353,7 +356,7 @@ void audio_in_process(void* arg) {
                         /* Start the I2S TX */
                         cyhal_i2s_start_tx(&i2s);
                     }
-                    USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                    USBD_AC_Send(&TX, 1, AUDIO_IN_BYTES_PER_USB_PACKET, audio_in_pcm_buffer);
                 }
                 break;
 
@@ -367,7 +370,7 @@ void audio_in_process(void* arg) {
 
             case MSG_MIC_DATA:
                 cyhal_gpio_write(CYBSP_USER_LED, CYBSP_LED_STATE_ON);
-                audio_in_count = 96;
+                audio_in_count = AUDIO_IN_SAMPLES_PER_USB_PACKET;
 
                 if (audio_in_pcm_buffer == audio_in_pcm_buffer_ping)
                 {
@@ -385,7 +388,7 @@ void audio_in_process(void* arg) {
                     /* Start the I2S TX */
                     cyhal_i2s_start_tx(&i2s);
                 }
-                USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                USBD_AC_Send(&TX, 1, AUDIO_IN_BYTES_PER_USB_PACKET, audio_in_pcm_buffer);
                 break;
 
             case MSG_MIC_CONTROL_UPDATE:
