@@ -62,10 +62,29 @@
 
 static const uint32_t mic_frequencies[] = { MICROPHONE_FREQUENCIES };
 
-struct AC_Global_t AC_Global;
+struct AC_Global_t AC_Global =
+{
+    .CurrMicFreq = MICROPHONE_FREQUENCIES,
+    .MicrophoneVolume = (U16)(int16_t)AUDIO_USB_MIC_VOLUME_DEFAULT_DB_256,
+    .MicrophoneMute = 0U,
+};
 MESSAGE          Msg_Buff[5];
 QueueHandle_t    Mail_Box;
 static StaticQueue_t    Static_Queue;
+
+static U16 audio_clamp_microphone_volume(int32_t volume_db_256)
+{
+    if (volume_db_256 < AUDIO_USB_MIC_VOLUME_MIN_DB_256)
+    {
+        volume_db_256 = AUDIO_USB_MIC_VOLUME_MIN_DB_256;
+    }
+    else if (volume_db_256 > AUDIO_USB_MIC_VOLUME_MAX_DB_256)
+    {
+        volume_db_256 = AUDIO_USB_MIC_VOLUME_MAX_DB_256;
+    }
+
+    return (U16)(int16_t)volume_db_256;
+}
 
 /********************************************************************************
 * Function Name: audio_set_interface_control_callback
@@ -155,13 +174,13 @@ static int audio_control_get_callback(const USBD_AC_CONTROL_INFO* pReqInfo, U8* 
             Value = AC_Global.MicrophoneVolume;
             break;
         case USB_AC_REQ_MIN:
-            Value = 0xF100;     /* -15 db */
+            Value = (U16)(int16_t)AUDIO_USB_MIC_VOLUME_MIN_DB_256;
             break;
         case USB_AC_REQ_MAX:
-            Value = 0x0000;      /* 0 db */
+            Value = (U16)(int16_t)AUDIO_USB_MIC_VOLUME_MAX_DB_256;
             break;
         case USB_AC_REQ_RES:
-            Value = 0x0001;      /* 1 db */
+            Value = (U16)(int16_t)AUDIO_USB_MIC_VOLUME_RES_DB_256;
             break;
         default:
             return -1;
@@ -206,12 +225,14 @@ static int audio_control_set_callback(const USBD_AC_CONTROL_INFO* pReqInfo, U32 
 
     case USBD_AC_ID_UNIT_MicControl + USB_AC_FU_VOLUME_CONTROL:
         if (pReqInfo->bRequest == USB_AC_REQ_CUR && NumBytes == 2) {
-            AC_Global.MicrophoneVolume = USBD_GetU16LE(pBuffer);
+            AC_Global.MicrophoneVolume = audio_clamp_microphone_volume((int16_t)USBD_GetU16LE(pBuffer));
+            audio_notify_microphone_control_change_from_isr();
         }
         return 0;
 
     case USBD_AC_ID_UNIT_MicControl + USB_AC_FU_MUTE_CONTROL:
-        AC_Global.MicrophoneMute = *pBuffer;
+        AC_Global.MicrophoneMute = (*pBuffer != 0U) ? 1U : 0U;
+        audio_notify_microphone_control_change_from_isr();
         return 0;
     }
     return -1;
@@ -344,6 +365,14 @@ void audio_usb_init(void)
 
     /* Set device information*/
     USBD_SetDeviceInfo(&usb_device_info);
+}
+
+void audio_usb_reset_state(void)
+{
+    USB_MEMSET(&AC_Global, 0, sizeof(AC_Global));
+    AC_Global.CurrMicFreq = MICROPHONE_FREQUENCIES;
+    AC_Global.MicrophoneVolume = (U16)(int16_t)AUDIO_USB_MIC_VOLUME_DEFAULT_DB_256;
+    AC_Global.MicrophoneMute = 0U;
 }
 
 /* [] END OF FILE */

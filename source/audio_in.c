@@ -41,6 +41,7 @@
 #include "audio.h"
 #include "audio_usb.h"
 #include "cybsp.h"
+#include "cy_pdl.h"
 #include "cy_retarget_io.h"
 #include "cyhal.h"
 #include "cyhal_psoc6_02_124_bga.h"
@@ -73,8 +74,6 @@
 #define DECIMATION_RATE             (64U)
 
 #define USE_I2S 0U
-#define AUDIO_DIGITAL_GAIN_NUM      (3)
-#define AUDIO_DIGITAL_GAIN_DEN      (1)
 
 /* Audio Subsystem Clock. UTypical values depends on the desired sample rate:
      * 8KHz / 16 KHz / 32 KHz / 48 KHz    : 24.576 MHz
@@ -94,6 +93,7 @@ TaskHandle_t rtos_audio_app_task;
 TaskHandle_t rtos_audio_in_task;
 
 static volatile bool usb_suspend_flag = false;
+static volatile bool microphone_control_dirty = true;
 
 /* PCM buffer data (16-bits) */
 uint16_t audio_in_pcm_buffer_ping[(MAX_AUDIO_IN_BUFFER_SIZE)];
@@ -111,8 +111,8 @@ const cyhal_pdm_pcm_cfg_t pdm_pcm_cfg =
     .decimation_rate = DECIMATION_RATE,
     .mode = CYHAL_PDM_PCM_MODE_STEREO,
     .word_length = AUDIO_IN_BIT_RESOLUTION,  /* bits */
-    .left_gain = CYHAL_PDM_PCM_MAX_GAIN,   /* dB */
-    .right_gain = CYHAL_PDM_PCM_MAX_GAIN,   /* dB */
+    .left_gain = 0,
+    .right_gain = 0,
 };
 
 const cyhal_i2s_pins_t i2s_pins = {
@@ -131,23 +131,65 @@ const cyhal_i2s_config_t i2s_config = {
     .sample_rate_hz = MICROPHONE_FREQUENCIES, /* In Hz */
 };
 
-static void audio_apply_gain(uint16_t *buffer, size_t sample_count)
+static int16_t audio_usb_volume_to_pdm_gain(U16 usb_volume_raw)
 {
-    for (size_t i = 0; i < sample_count; ++i)
+    int32_t volume_db_256 = (int16_t)usb_volume_raw;
+
+    if (volume_db_256 < AUDIO_USB_MIC_VOLUME_MIN_DB_256)
     {
-        int32_t sample = (int16_t)buffer[i];
-        sample = (sample * AUDIO_DIGITAL_GAIN_NUM) / AUDIO_DIGITAL_GAIN_DEN;
+        volume_db_256 = AUDIO_USB_MIC_VOLUME_MIN_DB_256;
+    }
+    else if (volume_db_256 > AUDIO_USB_MIC_VOLUME_MAX_DB_256)
+    {
+        volume_db_256 = AUDIO_USB_MIC_VOLUME_MAX_DB_256;
+    }
 
-        if (sample > 32767)
-        {
-            sample = 32767;
-        }
-        else if (sample < -32768)
-        {
-            sample = -32768;
-        }
+    if (volume_db_256 >= 0)
+    {
+        return (int16_t)((volume_db_256 + 64) / 128);
+    }
 
-        buffer[i] = (uint16_t)((int16_t)sample);
+    return (int16_t)((volume_db_256 - 64) / 128);
+}
+
+static void audio_apply_microphone_controls(void)
+{
+    U16 volume_raw = AC_Global.MicrophoneVolume;
+    U8 mute_enabled = AC_Global.MicrophoneMute;
+    int16_t gain = audio_usb_volume_to_pdm_gain(volume_raw);
+    cy_rslt_t result = cyhal_pdm_pcm_set_gain(&pdm_pcm, gain, gain);
+    if (CY_RSLT_SUCCESS != result)
+    {
+        CY_ASSERT(0);
+    }
+
+    if (mute_enabled != 0U)
+    {
+        Cy_PDM_PCM_EnableSoftMute(pdm_pcm.base);
+    }
+    else
+    {
+        Cy_PDM_PCM_DisableSoftMute(pdm_pcm.base);
+    }
+
+    microphone_control_dirty = false;
+}
+
+void audio_notify_microphone_control_change_from_isr(void)
+{
+    MESSAGE Msg;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    microphone_control_dirty = true;
+
+    if (Mail_Box != NULL)
+    {
+        Msg.Event = MSG_MIC_CONTROL_UPDATE;
+        (void)xQueueSendFromISR(Mail_Box, &Msg, &xHigherPriorityTaskWoken);
+        if (xHigherPriorityTaskWoken != pdFALSE)
+        {
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        }
     }
 }
 
@@ -221,6 +263,7 @@ void audio_in_init(void)
 
     /* Initialize the PDM PCM block */
     cyhal_pdm_pcm_init(&pdm_pcm, CYBSP_PDM_DATA, CYBSP_PDM_CLK, &audio_clock, &pdm_pcm_cfg);
+    audio_apply_microphone_controls();
 
     /* Create the AUDIO Write RTOS task */
     rtos_task_status = xTaskCreate(audio_in_process, "Audio In Task", AUDIO_TASK_STACK_DEPTH, NULL, AUDIO_WRITE_TASK_PRIORITY, &rtos_audio_in_task);
@@ -253,7 +296,9 @@ void audio_in_process(void* arg) {
     (void)arg;
 
     for (;;) {
-        USB_MEMSET(&AC_Global, 0, sizeof(AC_Global));
+        audio_usb_reset_state();
+        microphone_control_dirty = true;
+        audio_apply_microphone_controls();
         while (audio_usb_suspended())
         {
             cyhal_gpio_toggle(CYBSP_USER_LED);
@@ -265,6 +310,10 @@ void audio_in_process(void* arg) {
         while (audio_usb_configured()) {
 
             if (xQueueReceive(Mail_Box, &Msg, 100) == pdFALSE) {
+                if (microphone_control_dirty)
+                {
+                    audio_apply_microphone_controls();
+                }
                 continue;
             }
 
@@ -283,6 +332,11 @@ void audio_in_process(void* arg) {
 
                 /* Clear PDM/PCM RX FIFO */
                 cyhal_pdm_pcm_clear(&pdm_pcm);
+
+                if (microphone_control_dirty)
+                {
+                    audio_apply_microphone_controls();
+                }
 
                 /* Start PDM/PCM */
                 cyhal_pdm_pcm_start(&pdm_pcm);
@@ -326,13 +380,19 @@ void audio_in_process(void* arg) {
 
                 /* Read all the data in the PDM/PCM buffer */
                 cyhal_pdm_pcm_read(&pdm_pcm, (void*)audio_in_pcm_buffer, &audio_in_count);
-                audio_apply_gain(audio_in_pcm_buffer, audio_in_count);
                 if (USE_I2S) {
                     cyhal_i2s_write_async(&i2s, audio_in_pcm_buffer, audio_in_count);
                     /* Start the I2S TX */
                     cyhal_i2s_start_tx(&i2s);
                 }
                 USBD_AC_Send(&TX, 1, 192, audio_in_pcm_buffer);
+                break;
+
+            case MSG_MIC_CONTROL_UPDATE:
+                if (microphone_control_dirty)
+                {
+                    audio_apply_microphone_controls();
+                }
                 break;
 
             default:

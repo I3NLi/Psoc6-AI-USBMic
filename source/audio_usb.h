@@ -49,6 +49,11 @@
 extern "C" {
 #endif
 
+#define AUDIO_USB_MIC_VOLUME_MIN_DB_256         ((int16_t)-3072)
+#define AUDIO_USB_MIC_VOLUME_MAX_DB_256         ((int16_t)2688)
+#define AUDIO_USB_MIC_VOLUME_RES_DB_256         ((int16_t)128)
+#define AUDIO_USB_MIC_VOLUME_DEFAULT_DB_256     ((int16_t)0)
+
 #define AUDIO_DEVICE_VENDOR_ID               (0x0669)
 #if (AUDIO_SAMPLING_RATE_22KHZ == MICROPHONE_FREQUENCIES)
 #define AUDIO_DEVICE_PRODUCT_ID              (0x0225)
@@ -78,6 +83,7 @@ void audio_class_init_data(void);
 int audio_usb_suspended();
 int audio_usb_configured();
 void audio_usb_init(void);
+void audio_usb_reset_state(void);
 
 #if defined(__cplusplus)
 }

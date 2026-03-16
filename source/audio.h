@@ -74,6 +74,7 @@ typedef enum {
     MSG_MIC_ON,
     MSG_MIC_OFF,
     MSG_MIC_DATA,
+    MSG_MIC_CONTROL_UPDATE,
     MSG_SPEAKERAUX_ON,
     MSG_SPEAKERAUX_OFF,
     MSG_SPEAKERAUX_DATA,
@@ -125,6 +126,7 @@ void audio_in_process(void *arg);
 void audio_clock_init(void);
 void audio_app_task(void* arg);
 void i2s_isr_handler(void *arg, cyhal_i2s_event_t event);
+void audio_notify_microphone_control_change_from_isr(void);
 
 #if defined(__cplusplus)
 }
