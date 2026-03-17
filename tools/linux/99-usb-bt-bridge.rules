@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="0669", ATTRS{idProduct}=="0225", TAG+="systemd", ENV{SYSTEMD_WANTS}+="usb-bt-bridge@%k.service"
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="0669", ATTRS{idProduct}=="0226", TAG+="systemd", ENV{SYSTEMD_WANTS}+="usb-bt-bridge@%k.service"

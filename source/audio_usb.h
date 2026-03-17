@@ -44,6 +44,7 @@
 #include "cyhal.h"
 #include "Global.h"
 #include "Microphone_configs.h"
+#include "USB_CDC.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -66,14 +67,9 @@ static const USB_DEVICE_INFO usb_device_info = {
   AUDIO_DEVICE_VENDOR_ID,        // VendorId
   AUDIO_DEVICE_PRODUCT_ID,      // ProductId
   "Infineon Technologies",      // VendorName
-  "USB Sound Recorder",     // ProductName
+  "USB Audio BT Bridge",    // ProductName
   "13245678"      // SerialNumber
 };
-
-/******************************************************************************
-* Externs
-******************************************************************************/
-extern MESSAGE          Msg_Buff[5];
 
 /******************************************************************************
 * Functions
@@ -84,6 +80,13 @@ int audio_usb_suspended();
 int audio_usb_configured();
 void audio_usb_init(void);
 void audio_usb_reset_state(void);
+USB_CDC_HANDLE audio_usb_get_cdc_handle(void);
+int audio_usb_cdc_ready(void);
+void audio_usb_set_microphone_volume_db_256(int16_t volume_db_256);
+void audio_usb_set_microphone_mute(U8 mute_enabled);
+int16_t audio_usb_get_microphone_volume_db_256(void);
+U8 audio_usb_get_microphone_mute(void);
+void audio_usb_request_microphone_control_update(void);
 
 #if defined(__cplusplus)
 }

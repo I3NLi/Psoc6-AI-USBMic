@@ -43,6 +43,9 @@ openocd.tcl
 !.vscode/launch.json
 !.vscode/extensions.json
 # *.code-workspace
+/config.json
+/workspace/
+/ProgramHex.mtbdfu
 
 # IAR Embedded Workbench files
 

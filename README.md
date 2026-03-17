@@ -59,6 +59,10 @@ Install a terminal emulator if you don't have one. Instructions in this document
 
 This example uses the [Audacity](https://www.audacityteam.org/) tool to stream the audio recording from Infineon MCU detected as microphone. You can also use any other software tool that is able to stream audio data.
 
+For Linux hosts that need this board to provide Bluetooth in addition to the USB microphone, see [tools/linux/README.md](tools/linux/README.md) for the `udev + systemd + btattach` auto-attach setup.
+
+For Windows hosts, see [tools/windows/README.md](tools/windows/README.md). The current firmware works as USB audio plus a CDC ACM port on Windows, but using the board as a Windows Bluetooth adapter needs a separate Windows transport-driver path or a native USB Bluetooth device mode.
+
 
 
 ## Using the code example

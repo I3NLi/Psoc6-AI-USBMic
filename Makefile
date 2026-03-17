@@ -85,7 +85,7 @@ VERBOSE=1
 # ... then code in directories named COMPONENT_foo and COMPONENT_bar will be
 # added to the build
 #
-COMPONENTS+=USBD_BASE FREERTOS RTOS_AWARE 
+COMPONENTS+=USBD_BASE FREERTOS RTOS_AWARE
 
 # Like COMPONENTS, but disable optional code that was enabled by default.
 DISABLE_COMPONENTS=
@@ -101,7 +101,7 @@ SOURCES=
 INCLUDES=
 
 # Add additional defines to the build process (without a leading -D).
-DEFINES+=CY_RETARGET_IO_CONVERT_LF_TO_CRLF 
+DEFINES+=CY_RETARGET_IO_CONVERT_LF_TO_CRLF CY_RTOS_AWARE
 DEFINES+=USBD_ENABLE_DMA
 
 # Select softfp or hardfp floating point. Default is softfp.
@@ -194,3 +194,8 @@ endif
 $(info Tools Directory: $(CY_TOOLS_DIR))
 
 include $(CY_TOOLS_DIR)/make/start.mk
+
+# ModusToolbox 3.3 ships PSoC 6 OpenOCD scripts as target/psoc6_*.cfg.
+# The current cat1a recipe still resolves this device to the older
+# infineon/cy8cxxa.cfg path, which is not present in this tool bundle.
+override _MTB_RECIPE__OPENOCD_DEVICE_CFG=psoc6_2m.cfg

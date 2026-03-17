@@ -1,0 +1,18 @@
+[Unit]
+Description=Attach USB Bluetooth bridge on /dev/%I
+Requires=dev-%i.device
+BindsTo=dev-%i.device
+After=dev-%i.device systemd-udevd.service
+ConditionPathExists=/dev/%I
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/default/usb-bt-bridge
+ExecStartPre=-/usr/bin/env modprobe bluetooth
+ExecStartPre=-/usr/bin/env modprobe hci_uart
+ExecStart=/usr/bin/env btattach -B /dev/%I -P ${BT_ATTACH_PROTOCOL} -S ${BT_ATTACH_BAUD}
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

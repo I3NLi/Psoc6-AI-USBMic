@@ -44,6 +44,7 @@
 #include "cy_retarget_io.h"
 #include "audio.h"
 #include "audio_usb.h"
+#include "bt_hci_bridge.h"
 #include "rtos.h"
 
 
@@ -126,7 +127,7 @@ int main(void)
     printf("\x1b[2J\x1b[;H");
 
     printf("******************"
-        " emUSB-Device: Audio recorder "
+        " emUSB-Device: Audio + BT bridge "
         "******************\r\n\n");
 
     /* Initialize the audio clock based on audio sample rate */
@@ -137,6 +138,13 @@ int main(void)
 
     /* Initialize the USB and Audio application */
     audio_usb_init();
+
+    /* Initialize the Bluetooth HCI bridge */
+    result = bt_hci_bridge_init();
+    if (CY_RSLT_SUCCESS != result)
+    {
+        CY_ASSERT(0);
+    }
 
     /* Start the RTOS Scheduler */
     vTaskStartScheduler();

@@ -48,6 +48,7 @@
 #include "Global.h"
 #include "USB.h"
 #include "USB_AC.h"
+#include "USB_CDC.h"
 
 /*********************************************************************
 *      AUDIO configurations
@@ -71,6 +72,8 @@ struct AC_Global_t AC_Global =
 MESSAGE          Msg_Buff[5];
 QueueHandle_t    Mail_Box;
 static StaticQueue_t    Static_Queue;
+static USB_CDC_HANDLE   audio_usb_cdc_handle = -1;
+static U8               audio_usb_cdc_out_buffer[USB_FS_BULK_MAX_PACKET_SIZE];
 
 static U16 audio_clamp_microphone_volume(int32_t volume_db_256)
 {
@@ -84,6 +87,41 @@ static U16 audio_clamp_microphone_volume(int32_t volume_db_256)
     }
 
     return (U16)(int16_t)volume_db_256;
+}
+
+void audio_usb_request_microphone_control_update(void)
+{
+    MESSAGE Msg;
+
+    if (Mail_Box == NULL)
+    {
+        return;
+    }
+
+    Msg.Event = MSG_MIC_CONTROL_UPDATE;
+    (void)xQueueSend(Mail_Box, &Msg, 0);
+}
+
+void audio_usb_set_microphone_volume_db_256(int16_t volume_db_256)
+{
+    AC_Global.MicrophoneVolume = audio_clamp_microphone_volume(volume_db_256);
+    audio_usb_request_microphone_control_update();
+}
+
+void audio_usb_set_microphone_mute(U8 mute_enabled)
+{
+    AC_Global.MicrophoneMute = (mute_enabled != 0U) ? 1U : 0U;
+    audio_usb_request_microphone_control_update();
+}
+
+int16_t audio_usb_get_microphone_volume_db_256(void)
+{
+    return (int16_t)AC_Global.MicrophoneVolume;
+}
+
+U8 audio_usb_get_microphone_mute(void)
+{
+    return AC_Global.MicrophoneMute;
 }
 
 /********************************************************************************
@@ -306,6 +344,39 @@ void audio_class_init_data(void) {
 
 }
 
+static void audio_usb_cdc_init_data(void)
+{
+    USB_CDC_INIT_DATA InitData;
+    USB_ADD_EP_INFO EPBulkIn;
+    USB_ADD_EP_INFO EPBulkOut;
+    USB_ADD_EP_INFO EPIntIn;
+
+    USB_MEMSET(&InitData, 0, sizeof(InitData));
+    USB_MEMSET(&EPBulkIn, 0, sizeof(EPBulkIn));
+    USB_MEMSET(&EPBulkOut, 0, sizeof(EPBulkOut));
+    USB_MEMSET(&EPIntIn, 0, sizeof(EPIntIn));
+
+    EPBulkIn.InDir = USB_DIR_IN;
+    EPBulkIn.TransferType = USB_TRANSFER_TYPE_BULK;
+    EPBulkIn.MaxPacketSize = USB_FS_BULK_MAX_PACKET_SIZE;
+    InitData.EPIn = USBD_AddEPEx(&EPBulkIn, NULL, 0);
+
+    EPBulkOut.InDir = USB_DIR_OUT;
+    EPBulkOut.TransferType = USB_TRANSFER_TYPE_BULK;
+    EPBulkOut.MaxPacketSize = USB_FS_BULK_MAX_PACKET_SIZE;
+    InitData.EPOut = USBD_AddEPEx(&EPBulkOut,
+                                  audio_usb_cdc_out_buffer,
+                                  sizeof(audio_usb_cdc_out_buffer));
+
+    EPIntIn.InDir = USB_DIR_IN;
+    EPIntIn.TransferType = USB_TRANSFER_TYPE_INT;
+    EPIntIn.Interval = 64U;
+    EPIntIn.MaxPacketSize = USB_FS_INT_MAX_PACKET_SIZE;
+    InitData.EPInt = USBD_AddEPEx(&EPIntIn, NULL, 0);
+
+    audio_usb_cdc_handle = USBD_CDC_Add(&InitData);
+}
+
 /********************************************************************************
 * Function Name: audio_usb_configured
 ********************************************************************************
@@ -362,9 +433,20 @@ void audio_usb_init(void)
 
     /* Initialization data for the Audio class instance. */
     audio_class_init_data();
+    audio_usb_cdc_init_data();
 
     /* Set device information*/
     USBD_SetDeviceInfo(&usb_device_info);
+}
+
+USB_CDC_HANDLE audio_usb_get_cdc_handle(void)
+{
+    return audio_usb_cdc_handle;
+}
+
+int audio_usb_cdc_ready(void)
+{
+    return (audio_usb_cdc_handle >= 0) && audio_usb_configured();
 }
 
 void audio_usb_reset_state(void)
